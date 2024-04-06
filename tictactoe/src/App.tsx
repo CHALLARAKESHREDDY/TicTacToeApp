@@ -15,6 +15,7 @@ import {
   StatusBar,
   StyleSheet,
   Text,
+  TextInput,
   useColorScheme,
   View,
 } from 'react-native';
@@ -28,11 +29,30 @@ function App(): React.JSX.Element {
   const [isCross, setIsCross]=useState<boolean>(false)
   const [gameWinner,setGameWinner]=useState<string>("")
   const [gameState,setGameArray]=useState(new Array(9).fill("empty",0,9))
+  const [playerOne,setPlayerOne]=useState<string>("")
+  const [playerTwo,setPlayerTwo]=useState<string>("")
+  const [gameStarted,setGameStarted]=useState<boolean>(false)
+
+  const gameStartButton=()=>{
+    if ((playerOne) && (playerTwo)){
+      setGameStarted(true)
+    }
+    else{
+      return Snackbar.show({
+        text:"Enter the Players Name",
+        backgroundColor:"red",
+        textColor:"#ffffff"
+      })
+    }
+  }
+
 
   const reloadGame=()=>{
+    setGameStarted(false)
     setGameWinner("")
     setIsCross(false)
     setGameArray(new Array(9).fill("empty"))
+    
   }
 
   const checkIsWinner=()=>{
@@ -42,49 +62,49 @@ function App(): React.JSX.Element {
       gameState[0] === gameState[2] &&
       gameState[0] !== 'empty'
     ) {
-      setGameWinner(`${gameState[0]} won the game! 🥳`);
+      setGameWinner(`${isCross?playerTwo:playerOne} won the game! 🥳`);
     } else if (
       gameState[3] !== 'empty' &&
       gameState[3] === gameState[4] &&
       gameState[4] === gameState[5]
     ) {
-      setGameWinner(`${gameState[3]} won the game! 🥳`);
+      setGameWinner(`${isCross?playerTwo:playerOne} won the game! 🥳`);
     } else if (
       gameState[6] !== 'empty' &&
       gameState[6] === gameState[7] &&
       gameState[7] === gameState[8]
     ) {
-      setGameWinner(`${gameState[6]} won the game! 🥳`);
+      setGameWinner(`${isCross?playerTwo:playerOne} won the game! 🥳`);
     } else if (
       gameState[0] !== 'empty' &&
       gameState[0] === gameState[3] &&
       gameState[3] === gameState[6]
     ) {
-      setGameWinner(`${gameState[0]} won the game! 🥳`);
+      setGameWinner(`${isCross?playerTwo:playerOne} won the game! 🥳`);
     } else if (
       gameState[1] !== 'empty' &&
       gameState[1] === gameState[4] &&
       gameState[4] === gameState[7]
     ) {
-      setGameWinner(`${gameState[1]} won the game! 🥳`);
+      setGameWinner(`${isCross?playerTwo:playerOne} won the game! 🥳`);
     } else if (
       gameState[2] !== 'empty' &&
       gameState[2] === gameState[5] &&
       gameState[5] === gameState[8]
     ) {
-      setGameWinner(`${gameState[2]} won the game! 🥳`);
+      setGameWinner(`${isCross?playerTwo:playerOne} won the game! 🥳`);
     } else if (
       gameState[0] !== 'empty' &&
       gameState[0] === gameState[4] &&
       gameState[4] === gameState[8]
     ) {
-      setGameWinner(`${gameState[0]} won the game! 🥳`);
+      setGameWinner(`${isCross?playerTwo:playerOne} won the game! 🥳`);
     } else if (
       gameState[2] !== 'empty' &&
       gameState[2] === gameState[4] &&
       gameState[4] === gameState[6]
     ) {
-      setGameWinner(`${gameState[2]} won the game! 🥳`);
+      setGameWinner(`${isCross?playerTwo:playerOne} won the game! 🥳`);
     } else if (!gameState.includes('empty', 0)) {
       setGameWinner('Draw game... ⌛️');
     }
@@ -116,19 +136,17 @@ function App(): React.JSX.Element {
   }
 
 
-
-  return (
-    <SafeAreaView >
-      <StatusBar
-        backgroundColor={"green"}
-      />
-      {gameWinner?(
+  const resultFunction=()=>{
+    if (gameStarted) {
+      return(
+         <>
+         {gameWinner?(
         <View style={[styles.topContainer,styles.winnerInfo]} >
           <Text   >{gameWinner}</Text>
         </View>
       ):(
         <View style={[styles.topContainer,isCross?styles.playerX : styles.playerO]}>
-          <Text style={styles.turnText}>{isCross?"X":"O"} turn</Text>
+          <Text style={styles.turnText}>{isCross?playerTwo:playerOne} turn</Text>
         </View>
       )}
       <FlatList  
@@ -149,11 +167,62 @@ function App(): React.JSX.Element {
           {gameWinner ? 'Start new game' : 'reload the game'}
         </Text>
       </Pressable>
+         </>
+      )
+  }else{
+    return(
+      <View style={styles.InputContainer}>
+        <Text style={styles.Head}>Tic-Tac-Toe</Text>
+        <TextInput value={playerOne} placeholder='player-one name' onChangeText={setPlayerOne} style={styles.input}/>
+        <TextInput value={playerTwo} placeholder='player-two name' onChangeText={setPlayerTwo} style={styles.input}/>
+        <Pressable style={styles.gameBtn} onPress={gameStartButton}>
+          <Text>Start the Game</Text>
+        </Pressable>
+
+      </View>
+    )
+  }
+
+}
+
+
+
+
+  return (
+    <SafeAreaView >
+      <StatusBar
+        backgroundColor={"green"}
+      />
+      {
+        resultFunction()
+      }
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  InputContainer:{
+    width:"100%",
+    alignSelf:"center",
+    marginTop:100,
+  },
+
+  Head:{
+alignSelf:"center",
+fontSize:27,
+fontWeight:"600",
+marginBottom:20,
+color:"#BCD6CF"
+
+  },
+
+  input:{
+     backgroundColor:"grey",
+     borderRadius:10,
+     margin:15,
+     padding:12,
+     paddingLeft:20
+  },
 
  topContainer:{
   
